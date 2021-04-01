@@ -183,7 +183,7 @@ class InstagramScraper(object):
             metrics = json_data['entry_data']['TagPage'][0]['graphql']['hashtag']['edge_hashtag_to_related_tags'][
                 "edges"]
         except Exception as e:
-            raise e
+            print (f'Error found: {e}')
         else:
             for node in metrics:
                 node = node.get('node')
