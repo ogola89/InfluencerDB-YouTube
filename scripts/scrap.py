@@ -2,7 +2,7 @@ import json
 import requests
 from bs4 import BeautifulSoup
 from pprint import pprint
-from proxychange import ProxyChanger
+#from proxychange import ProxyChanger
 import time
 
 
@@ -113,14 +113,20 @@ class InstagramScraper(object):
 
     def profile_page_metrics(self, json_data_from_profile):
         results = {}
-        metrics = json_data_from_profile['entry_data']['ProfilePage'][0]['graphql']['user']
-        for key, value in metrics.items():
-            if key != 'edge_owner_to_timeline_media':
-                if value and isinstance(value, dict):
-                    value = value['count']
-                    results[key] = value
-                elif value:
-                    results[key] = value
+        try:
+            metrics = json_data_from_profile['entry_data']['ProfilePage'][0]['graphql']['user']
+            for key, value in metrics.items():
+                if key != 'edge_owner_to_timeline_media':
+                    if value and isinstance(value, dict):
+                        try:
+                            value = value['count']
+                            results[key] = value
+                        except:
+                            continue
+                    elif value:
+                        results[key] = value
+        except:
+            results['error'] = 'No profile data found for user'
         return results
 
     def profile_page_recent_posts(self, json_data_from_profile):
@@ -142,8 +148,10 @@ class InstagramScraper(object):
             json_data = self.extract_json_data(response)
             metrics = json_data['entry_data']['TagPage'][0]['graphql']['hashtag']['edge_hashtag_to_top_posts'][
                 "edges"]
-        except Exception as e:
-            raise e
+        except:
+            pass
+          
+            
         else:
             for node in metrics:
                 node = node.get('node')
